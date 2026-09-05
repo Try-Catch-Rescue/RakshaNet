@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RakshaNet — Urban Flood Disaster Management MVP</title>
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A2E2F">
+<meta name="description" content="RakshaNet — AI-assisted disaster intelligence, citizen SOS and emergency response platform.">
+<meta name="application-name" content="RakshaNet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+
+<div class="switcher-bar">
+  <div class="brand">
+    <div class="brand-mark">R</div>
+    <div class="brand-name">RakshaNet</div>
+  </div>
+  <div class="demo-status"><span class="live-dot"></span><span>LIVE DEMO</span><small>Disaster intelligence network</small></div>
+  <div class="bar-right">
+    <div class="lang-switch" id="topLangSwitch">
+      <button data-lang="en" class="active" onclick="setLang('en')">EN</button>
+      <button data-lang="bn" onclick="setLang('bn')">বাং</button>
+      <button data-lang="hi" onclick="setLang('hi')">हिं</button>
+    </div>
+    <button class="judge-demo-btn" onclick="startJudgeDemo()">▶ Judge Demo</button>
+    <div class="tabs">
+      <button class="tab-btn active" data-view="citizen-view" onclick="switchView(this)">Citizen App</button>
+      <button class="tab-btn" data-view="admin-view" onclick="switchView(this)">Admin Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<div class="demo-story" id="demoStory" aria-live="polite">
+  <div class="story-inner">
+    <span class="story-step active">01 · Detect</span><span>→</span><span class="story-step">02 · Report</span><span>→</span><span class="story-step">03 · Prioritize</span><span>→</span><span class="story-step">04 · Respond</span>
+  </div>
+</div>
+
+<!-- ============ CITIZEN PORTAL ============ -->
+<div id="citizen-view" class="view active">
+  <div class="citizen-shell lang-en">
+    <div class="offline-banner" id="offlineBanner" style="display:none;"></div>
+    <div class="app-toprow">
+      <button class="speak-btn" onclick="speakCurrentScreen()" title="Read this screen aloud">🔊<span>Read aloud</span></button>
+    </div>
+    <div class="app-screen" id="phone-screen"></div>
+    <div class="bottom-nav">
+      <button class="nav-item" data-screen="home" onclick="showScreen('home')"><span class="ic">🏠</span>Home</button>
+      <button class="nav-item" data-screen="map" onclick="showScreen('map')"><span class="ic">🗺️</span>Map</button>
+      <button class="nav-item sos" data-screen="sos" onclick="showScreen('sos')"><span class="ic">SOS</span></button>
+      <button class="nav-item" data-screen="shelters" onclick="showScreen('shelters')"><span class="ic">🏫</span>Shelters</button>
+      <button class="nav-item" data-screen="more" onclick="showScreen('more')"><span class="ic">☰</span>More</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADMIN / RESCUE DASHBOARD ============ -->
+<div id="admin-view" class="view">
+<div class="admin-shell">
+  <div class="admin-sidebar">
+    <div class="admin-brand"><div class="mark">R</div><div class="name">RakshaNet</div></div>
+    <nav class="admin-nav">
+      <a href="javascript:void(0)" data-page="dashboard" class="active" onclick="setAdminPage('dashboard')"><span class="ic">▤</span>Dashboard</a>
+      <a href="javascript:void(0)" data-page="map" onclick="setAdminPage('map')"><span class="ic">🗺️</span>Live Map</a>
+      <a href="javascript:void(0)" data-page="incidents" onclick="setAdminPage('incidents')"><span class="ic">⚠️</span>Incidents</a>
+      <a href="javascript:void(0)" data-page="sos" onclick="setAdminPage('sos')"><span class="ic">🚨</span>SOS Requests <span class="count" id="navSosCount">0</span></a>
+      <a href="javascript:void(0)" data-page="teams" onclick="setAdminPage('teams')"><span class="ic">🚑</span>Rescue Teams</a>
+      <a href="javascript:void(0)" data-page="shelters" onclick="setAdminPage('shelters')"><span class="ic">🏫</span>Shelters</a>
+      <a href="javascript:void(0)" data-page="roads" onclick="setAdminPage('roads')"><span class="ic">🚧</span>Roads &amp; Blocks</a>
+      <a href="javascript:void(0)" data-page="alerts" onclick="setAdminPage('alerts')"><span class="ic">🔔</span>Alerts</a>
+      <a href="javascript:void(0)" data-page="reports" onclick="setAdminPage('reports')"><span class="ic">📊</span>Reports</a>
+      <a href="javascript:void(0)" data-page="settings" onclick="setAdminPage('settings')"><span class="ic">⚙️</span>Settings</a>
+    </nav>
+    <div class="admin-user"><div class="av"></div><div class="info"><b>Admin User</b><span>Control Room</span></div></div>
+  </div>
+
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div><h1 id="adminPageTitle">Dashboard</h1><p id="adminPageSub">Monitor. Prioritize. Respond. — Kolkata Metropolitan Region</p></div>
+      <div class="bell">🔔<span class="dot"></span></div>
+    </div>
+    <div id="adminMain"></div>
+  </div>
+</div>
+</div>
+
+<!-- ============ DEMO CONTROL DOCK (judge panel) ============ -->
+<div class="demo-dock" id="demoDock">
+  <div class="demo-panel" id="demoPanel">
+    <h4>⚙ Demo Controls</h4>
+    <div class="grp">
+      <div class="grp-lbl">Simulate risk level (updates live everywhere)</div>
+      <div class="risk-btns" id="riskBtns">
+        <button data-lvl="low" onclick="setRisk('low')">🟢 Low</button>
+        <button data-lvl="medium" onclick="setRisk('medium')">🟡 Medium</button>
+        <button data-lvl="high" onclick="setRisk('high')">🟠 High</button>
+        <button data-lvl="critical" onclick="setRisk('critical')">🔴 Critical</button>
+      </div>
+    </div>
+    <div class="grp">
+      <div class="grp-lbl">Simulate citizens</div>
+      <button class="demo-action" onclick="generateRandomSOS()">📡 Simulate incoming SOS</button>
+      <button class="demo-action reset" onclick="resetDemo()">↺ Reset demo</button>
+    </div>
+  </div>
+  <div class="demo-fab" onclick="toggleDock()">⚙</div>
+</div>
+
+<!-- module scripts — order matters: data/i18n before scoring/state before UI before app -->
+<script src="js/i18n.js"></script>
+<script src="js/data.js"></script>
+<script src="js/scoring.js"></script>
+<script src="js/state.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/offline.js"></script>
+<script src="js/accessibility.js"></script>
+<script src="js/citizen.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

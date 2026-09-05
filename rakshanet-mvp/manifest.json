@@ -1,0 +1,13 @@
+{
+  "name": "RakshaNet — Disaster Risk, Evacuation & Rescue",
+  "short_name": "RakshaNet",
+  "description": "AI-powered urban flood risk, evacuation and rescue platform. Works fully offline once installed.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#146c3f",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
